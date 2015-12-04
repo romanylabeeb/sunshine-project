@@ -1,5 +1,7 @@
 package com.example.profit3.testfirst.parser;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -47,6 +49,7 @@ return tempData.getDouble("max");
      */
     public static String formatHighLows(double high, double low) {
         // For presentation, assume the user doesn't care about tenths of a degree.
+
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
 

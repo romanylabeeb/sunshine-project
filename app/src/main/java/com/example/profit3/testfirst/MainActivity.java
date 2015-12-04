@@ -1,6 +1,9 @@
 package com.example.profit3.testfirst;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -67,7 +70,20 @@ public class MainActivity extends ActionBarActivity {
             startActivity(settingIntent);
             return true;
         }
+if(id==R.id.action_map){
+    SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+    String location=prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+    Uri  geoLoc=Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("q",location).build();
+Intent geoIntent=new Intent(Intent.ACTION_VIEW);
+    geoIntent.setData(geoLoc);
+if(null!=geoIntent.resolveActivity(getPackageManager())) {
+    startActivity(geoIntent);
+}
+    else{
+    Log.d("error","couldn't call "+location);
+    }
 
+}
         return super.onOptionsItemSelected(item);
     }
 

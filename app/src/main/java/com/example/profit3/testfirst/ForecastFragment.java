@@ -59,9 +59,9 @@ public  class ForecastFragment extends Fragment {
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
-    @Override
+//    @Override
 public void onStart(){
-
+super.onStart();
 this.updateWeather();
 }
     /**
@@ -84,28 +84,12 @@ this.updateWeather();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        // Create some dummy data
-        String[] fakeData = {
-                "Sun 06/23 -cloudy ,17/10",
-                "Mon 06/24 -Rainy ,17/10",
-                "Tue 06/25 -Rainy ,17/10",
-                "Wen 06/26 -Sunny ,20/10",
-                "Thu 06/27 -Sunny ,20/10",
-                "Fri 06/28 -Sunny ,21/10",
-                "Sun 06/29 -Sunny ,22/10",
-                "Sat 06/30 -Sunny ,20/10",
-                "Sun 06/31 -Sunny ,20/10"
-
-        };
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(fakeData));
-
         forecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(),
                         R.layout.list_item_forecast,
                         R.id.list_item_forecast_textview,
-                        weekForecast);
+                        new ArrayList<String>());
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
@@ -141,7 +125,8 @@ this.updateWeather();
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
 
-this.updateWeather();
+            //steps call async class & excute
+            updateWeather();
             return true;
         }
 
@@ -153,8 +138,9 @@ this.updateWeather();
         FetchWeatherTask weatherTask = new FetchWeatherTask();
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getActivity());
         String location=prefs.getString(getString( R.string.pref_location_key),    getString(R.string.pref_location_default));
-
-        weatherTask.execute(location);
+String unitType=prefs.getString(getString( R.string.pref_temperature_units_key),    getString(R.string.pref_default_temperature_unit));
+      System.out.println("\n\n\n unit="+unitType+"\n\n\n\n");
+        weatherTask.execute(location,unitType);
     }
 
 
@@ -171,7 +157,7 @@ this.updateWeather();
             this.appConnection=new AppConnection();
             //postalCODE "SMOUHA"=21615
             //Reference http://www.nmisr.com/vb/showthread.php?t=545267
-           final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json","metric",7);
+           final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json",params[1],7);
 
          String forecastJsonStr=   this.appConnection.getResponseByUrl(FORECAST_BASE_URL_ONE_WEEK);
 

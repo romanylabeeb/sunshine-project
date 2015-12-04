@@ -10,9 +10,32 @@
     <string name="action_sub2" transable="false">sub2</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="action_map">preferred map</string>
 
+
+    <!-- for preferences  -->
     <string name="pref_location_key" transable="false">Location</string>
-    <string name="pref_location_title" transable="false">Alexandria</string>
-    <string name="pref_location_default" translatable="false">alexandria,EG</string>
+    <string name="pref_location_title" transable="false">Location</string>
+    <string name="pref_location_default" translatable="false">"alexandria,EG"</string>
+
+
+
+    <string name="pref_temperature_units_key" transable="false">units</string>
+    <string name="pref_temperature_unit_title" transable="false">Temperature Units</string>
+
+
+    <string name="pref_metric_temperature_unit" transable="false">metric</string>
+    <string name="pref_imperial_temperature_unit" transable="false">imperial</string>
+    <string name="pref_default_temperature_unit" transable="false">@string/pref_metric_temperature_unit</string>
+<string-array name="pref_temperature_unit_options" >
+    <item name="pref_metric_temp" >@string/pref_metric_temperature_unit</item>
+    <item name="pref_imperial_temp">@string/pref_imperial_temperature_unit</item>
+</string-array>
+
+    <string-array name="pref_temperature_unit_values" >
+        <item name="pref_metric_temp" >@string/pref_metric_temperature_unit</item>
+        <item name="pref_imperial_temp">@string/pref_imperial_temperature_unit</item>
+    </string-array>
+
 
 </resources>
