@@ -1,8 +1,11 @@
 package com.example.profit3.testfirst;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.profit3.testfirst.connection.AppConnection;
 import com.example.profit3.testfirst.parser.WeatherDataParser;
+import com.example.profit3.testfirst.settings.SettingsActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +59,11 @@ public  class ForecastFragment extends Fragment {
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
+    @Override
+public void onStart(){
 
+this.updateWeather();
+}
     /**
      * for adding the fragment menu to main menu
      * @param menu
@@ -107,6 +115,12 @@ public  class ForecastFragment extends Fragment {
                 String  text = forecastAdapter.getItem(position);
                 int duration = Toast.LENGTH_SHORT;
                 Toast.makeText(getActivity(), text, duration).show();
+                // Executed in an Activity, so 'this' is the Context
+// The fileUrl is a string URL, such as "http://www.example.com/image.png"
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+                detailIntent.putExtra(Intent.EXTRA_TEXT,text);
+               // downloadIntent.setData(Uri.parse(fileUrl));
+                startActivity(detailIntent);
             }
         });
 
@@ -126,26 +140,38 @@ public  class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            //steps call async class & excute
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute();
+
+this.updateWeather();
             return true;
         }
+
+
         return super.onOptionsItemSelected(item);
+    }
+    private  void updateWeather(){
+        //steps call async class & excute
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location=prefs.getString(getString( R.string.pref_location_key),    getString(R.string.pref_location_default));
+
+        weatherTask.execute(location);
     }
 
 
 
-    public class FetchWeatherTask extends AsyncTask<Void, Void, String[]> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
         private AppConnection appConnection;
         @Override
-        protected String[] doInBackground(Void... params) {
+        protected String[] doInBackground(String... params) {
+            if (params.length == 0) {
+                return null;
+            }
             this.appConnection=new AppConnection();
             //postalCODE "SMOUHA"=21615
             //Reference http://www.nmisr.com/vb/showthread.php?t=545267
-           final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters("21646","json","metric",7);
+           final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json","metric",7);
 
          String forecastJsonStr=   this.appConnection.getResponseByUrl(FORECAST_BASE_URL_ONE_WEEK);
 
