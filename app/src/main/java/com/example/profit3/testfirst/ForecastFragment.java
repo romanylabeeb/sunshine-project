@@ -156,7 +156,7 @@ public  class ForecastFragment extends Fragment {
             this.appConnection=new AppConnection();
             //postalCODE "SMOUHA"=21615
             //Reference http://www.nmisr.com/vb/showthread.php?t=545267
-            final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json",params[1],7,R.string);
+            final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json",params[1],7);
 
             String forecastJsonStr=   this.appConnection.getResponseByUrl(FORECAST_BASE_URL_ONE_WEEK);
 
