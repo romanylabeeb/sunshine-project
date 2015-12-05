@@ -59,11 +59,11 @@ public  class ForecastFragment extends Fragment {
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
-//    @Override
-public void onStart(){
-super.onStart();
-this.updateWeather();
-}
+    //    @Override
+    public void onStart(){
+        super.onStart();
+        this.updateWeather();
+    }
     /**
      * for adding the fragment menu to main menu
      * @param menu
@@ -103,7 +103,7 @@ this.updateWeather();
 // The fileUrl is a string URL, such as "http://www.example.com/image.png"
                 Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
                 detailIntent.putExtra(Intent.EXTRA_TEXT,text);
-               // downloadIntent.setData(Uri.parse(fileUrl));
+                // downloadIntent.setData(Uri.parse(fileUrl));
                 startActivity(detailIntent);
             }
         });
@@ -138,8 +138,7 @@ this.updateWeather();
         FetchWeatherTask weatherTask = new FetchWeatherTask();
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getActivity());
         String location=prefs.getString(getString( R.string.pref_location_key),    getString(R.string.pref_location_default));
-String unitType=prefs.getString(getString( R.string.pref_temperature_units_key),    getString(R.string.pref_default_temperature_unit));
-      System.out.println("\n\n\n unit="+unitType+"\n\n\n\n");
+        String unitType=prefs.getString(getString( R.string.pref_temperature_units_key),    getString(R.string.pref_default_temperature_unit));
         weatherTask.execute(location,unitType);
     }
 
@@ -157,12 +156,12 @@ String unitType=prefs.getString(getString( R.string.pref_temperature_units_key),
             this.appConnection=new AppConnection();
             //postalCODE "SMOUHA"=21615
             //Reference http://www.nmisr.com/vb/showthread.php?t=545267
-           final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json",params[1],7);
+            final String FORECAST_BASE_URL_ONE_WEEK=appConnection.buildRequestURLByParameters(params[0],"json",params[1],7,R.string);
 
-         String forecastJsonStr=   this.appConnection.getResponseByUrl(FORECAST_BASE_URL_ONE_WEEK);
+            String forecastJsonStr=   this.appConnection.getResponseByUrl(FORECAST_BASE_URL_ONE_WEEK);
 
 
-           System.out.println("response="+forecastJsonStr);
+            System.out.println("response="+forecastJsonStr);
             try {
                 return WeatherDataParser.getWeatherDataFromJson(forecastJsonStr,7);
             } catch (JSONException e) {
@@ -181,7 +180,7 @@ String unitType=prefs.getString(getString( R.string.pref_temperature_units_key),
             if(results!=null){
                 forecastAdapter.clear();
 
-                  forecastAdapter.addAll(results);
+                forecastAdapter.addAll(results);
 
             }
 

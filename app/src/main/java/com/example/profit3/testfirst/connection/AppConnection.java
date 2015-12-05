@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.net.ssl.HttpsURLConnection;
 
 
 /**
@@ -21,10 +20,8 @@ public class AppConnection {
     private final String LOG_TAG = AppConnection.class.getSimpleName();
     // These two need to be declared outside the try/catch
     // so that they can be closed in the finally block.
-    HttpsURLConnection urlConnection = null;
-    BufferedReader reader = null;
-    private static String APPID="b6acf08c16531a1081f95956ad5698ed";
-public static final String BASE_URL="http://api.openweathermap.org/data/2.5/forecast/daily?";
+    private static String APPID= "b6acf08c16531a1081f95956ad5698ed";
+    public static final String BASE_URL="http://api.openweathermap.org/data/2.5/forecast/daily?";
 
     public static final String QUERY_PARAM="q";
     public static final String MODE_PARAM="mode";
@@ -33,8 +30,9 @@ public static final String BASE_URL="http://api.openweathermap.org/data/2.5/fore
     public static final String DEFAULT_MODE="json";
     public static final String DEFAULT_UNITS="metric";
     public String buildRequestURLByParameters(String q,String mode,String units,int days){
+
         Uri buildURL=Uri.parse(BASE_URL).buildUpon().appendQueryParameter(QUERY_PARAM,q).appendQueryParameter(MODE_PARAM,mode).appendQueryParameter(UNITS_PARAM,units).appendQueryParameter(DAYS_PARAM,Integer.toString(days)).appendQueryParameter("APPID",APPID).build();
-   System.out.println("current url="+buildURL.toString()   );
+        System.out.println("current url="+buildURL.toString()   );
         return  buildURL.toString();
     }
     public String getResponseByUrl(String baseUrl){
@@ -50,13 +48,16 @@ public static final String BASE_URL="http://api.openweathermap.org/data/2.5/fore
             // http://openweathermap.org/API#forecast
 
 
-           URL  url = new URL(baseUrl);
-
+            //    System.out.println("baseURL="+baseUrl);
+            URL url = new URL(baseUrl);
+            // URLConnection connection = url.openConnection();
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
 
+// Send post request
+
+            urlConnection.connect();
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
