@@ -14,6 +14,7 @@ import android.os.Build;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.profit3.sunshine.R;
 import com.example.profit3.testfirst.connection.AppConnection;
 
 import java.io.BufferedReader;
