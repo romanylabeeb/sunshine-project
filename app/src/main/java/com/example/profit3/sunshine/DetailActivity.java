@@ -1,10 +1,13 @@
 package com.example.profit3.sunshine;
 
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
@@ -18,16 +21,16 @@ import android.widget.TextView;
 
 import com.example.profit3.sunshine.settings.SettingsActivity;
 
-public class DetailActivity extends ActionBarActivity {
+public class DetailActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailFragment())
-                    .commit();
+            Fragment newFragment = new DetailFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.container, newFragment).commit();
         }
     }
 
@@ -55,7 +58,7 @@ public class DetailActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             //steps call async class & excute
             Intent settingIntent = new Intent(this, SettingsActivity.class);
-            settingIntent.putExtra(Intent.EXTRA_TEXT,"settings");
+            settingIntent.putExtra(Intent.EXTRA_TEXT, "settings");
             // downloadIntent.setData(Uri.parse(fileUrl));
             startActivity(settingIntent);
             return true;
@@ -109,7 +112,7 @@ public class DetailActivity extends ActionBarActivity {
 
             // Attach an intent to this ShareActionProvider.  You can update this at any time,
             // like when the user selects a new piece of data they might like to share.
-            if (mShareActionProvider != null ) {
+            if (mShareActionProvider != null) {
                 mShareActionProvider.setShareIntent(createShareForecastIntent());
             } else {
                 Log.d(LOG_TAG, "Share Action Provider is null?");

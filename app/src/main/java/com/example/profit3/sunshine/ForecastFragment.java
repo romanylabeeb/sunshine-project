@@ -1,10 +1,13 @@
 package com.example.profit3.sunshine;
 
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,20 +15,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.profit3.sunshine.aysncTask.FetchWeatherTask;
-
-import java.util.ArrayList;
+import com.example.profit3.sunshine.data.WeatherContract;
 
 /**
  * Created by Profit3 on 21/11/2015.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ArrayAdapter<String> forecastAdapter;
+    private ForecastAdapter mForecastAdapter;
+    private static final int LOADER_ID = 17;
+    private int mPosition = ListView.INVALID_POSITION;
+    private ListView wheatherListView;
 
     public ForecastFragment() {
     }
@@ -43,10 +47,11 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    //    @Override
-    public void onStart() {
-        super.onStart();
-        this.updateWeather();
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getActivity().getLoaderManager().initLoader(LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+
     }
 
     /**
@@ -71,19 +76,22 @@ public class ForecastFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        forecastAdapter =
-                new ArrayAdapter<String>(
-                        getActivity(),
-                        R.layout.list_item_forecast,
-                        R.id.list_item_forecast_textview,
-                        new ArrayList<String>());
+
+        // The CursorAdapter will take data from our cursor and populate the ListView
+        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
+        // up with an empty list the first time we run.
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(forecastAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        // Get a reference to the ListView, and attach this adapter to it.
+        wheatherListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        wheatherListView.setAdapter(mForecastAdapter);
+
+        wheatherListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String text = forecastAdapter.getItem(position);
+                String text = mForecastAdapter.get(position);
                 int duration = Toast.LENGTH_SHORT;
                 Toast.makeText(getActivity(), text, duration).show();
                 // Executed in an Activity, so 'this' is the Context
@@ -123,11 +131,35 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        //steps call async class & excute
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(),forecastAdapter);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-        String unitType = prefs.getString(getString(R.string.pref_temperature_units_key), getString(R.string.pref_default_temperature_unit));
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+        String location = Utility.getPreferredLocation(getActivity());
+        String unitType = Utility.getCurrentUnit(getActivity());
         weatherTask.execute(location, unitType);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+        return new CursorLoader(getActivity(), weatherForLocationUri, WeatherContract.WeatherEntry.FORECAST_COLUMNS, null, null, sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mForecastAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            wheatherListView.smoothScrollToPosition(mPosition);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
     }
 }
